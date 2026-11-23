@@ -1,7 +1,7 @@
 name: Build and smoke-test EduPulse
 on:
   push:
-    branches: [main, feature/console-ui-and-fixes]
+    branches: [main, upgrade/net11]
   pull_request:
     branches: [main]
 
@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.0.x'
+          dotnet-version: '11.0.x'
       - name: Restore and build
         run: dotnet build "C#_проект_shcolo/C#_проект_shcolo/C#_проект_shcolo.csproj" --configuration Release -warnaserror
       - name: Smoke test student view and teacher grade persistence
