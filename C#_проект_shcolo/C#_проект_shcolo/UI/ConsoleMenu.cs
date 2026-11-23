@@ -278,7 +278,7 @@ namespace C__проект_shcolo.UI
 
         private static void Header(string title, string subtitle)
         {
-            Console.Clear();
+            if (!Console.IsOutputRedirected) Console.Clear();
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("╔════════════════════════════════════════════════════════════╗");
             Console.WriteLine("║                        EDUPULSE                            ║");
