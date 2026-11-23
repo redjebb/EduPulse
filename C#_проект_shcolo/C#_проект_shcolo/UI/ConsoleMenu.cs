@@ -33,6 +33,7 @@ namespace C__проект_shcolo.UI
                 MenuItem("1", "Вход като ученик");
                 MenuItem("2", "Вход като учител");
                 MenuItem("0", "Изход");
+                Footer("DEMO MODE  •  Локални данни  •  C# / .NET 9");
                 int choice = InputValidator.ReadInt("Избор: ", 0, 2);
                 if (choice == 0) return;
                 if (choice == 1) ChooseStudent();
@@ -86,6 +87,7 @@ namespace C__проект_shcolo.UI
                 Metric("ОБЩ УСПЕХ", student.Grades.Count == 0 ? "Няма оценки" : grades.GetAverage(student.Id).ToString("F2"));
                 Metric("ОЦЕНКИ", student.Grades.Count.ToString());
                 Console.WriteLine();
+                Section("НАВИГАЦИЯ");
                 MenuItem("1", "Моите оценки");
                 MenuItem("2", "Успех по предмети");
                 MenuItem("3", "Grade Simulator");
@@ -112,6 +114,7 @@ namespace C__проект_shcolo.UI
                 Metric("УЧЕНИЦИ", database.Students.Count.ToString());
                 Metric("ПРЕДМЕТИ", teacher.SubjectIds.Count.ToString());
                 Console.WriteLine();
+                Section("УПРАВЛЕНИЕ");
                 MenuItem("1", "Списък с ученици");
                 MenuItem("2", "Добави оценка");
                 MenuItem("3", "Преглед на оценки");
@@ -264,6 +267,13 @@ namespace C__проект_shcolo.UI
             Console.WriteLine();
             Metric("СЕГА", current);
             Metric("СЛЕД ПРОБНАТА ОЦЕНКА", nextAverage.ToString("F2"));
+            double change = existingCount == 0 ? 0 : nextAverage - grades.GetSubjectAverage(student.Id, subject.Id);
+            if (existingCount > 0)
+            {
+                Console.ForegroundColor = change >= 0 ? ConsoleColor.Green : ConsoleColor.Yellow;
+                Console.WriteLine($"  ПРОМЯНА: {change:+0.00;-0.00;0.00}");
+                Console.ResetColor();
+            }
             Notice("Това е симулация — оценката НЕ е записана.", ConsoleColor.Green);
         }
 
@@ -279,20 +289,41 @@ namespace C__проект_shcolo.UI
         private static void Header(string title, string subtitle)
         {
             if (!Console.IsOutputRedirected) Console.Clear();
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
+            Console.WriteLine("  ╭──────────────────────────────────────────────────────────╮");
+            Console.Write("  │  ");
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("╔════════════════════════════════════════════════════════════╗");
-            Console.WriteLine("║                        EDUPULSE                            ║");
-            Console.WriteLine("╚════════════════════════════════════════════════════════════╝");
+            Console.Write("◆ EDUPULSE");
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine("                          SCHOOL CONSOLE  │");
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
+            Console.WriteLine("  ╰──────────────────────────────────────────────────────────╯");
             Console.ResetColor();
             Console.WriteLine();
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("  " + title);
-            Console.ResetColor();
             Console.ForegroundColor = ConsoleColor.DarkGray;
             Console.WriteLine("  " + subtitle);
             Console.ResetColor();
             Console.WriteLine("  " + new string('─', 54));
             Console.WriteLine();
+        }
+
+        private static void Section(string title)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
+            Console.WriteLine("  " + title);
+            Console.ResetColor();
+            Console.WriteLine();
+        }
+
+        private static void Footer(string message)
+        {
+            Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine("  " + new string('─', 54));
+            Console.WriteLine("  " + message);
+            Console.ResetColor();
         }
 
         private static void MenuItem(string index, string title)
