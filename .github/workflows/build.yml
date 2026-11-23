@@ -1,4 +1,4 @@
-name: Build EduPulse
+name: Build and smoke-test EduPulse
 on:
   push:
     branches: [main, feature/console-ui-and-fixes]
@@ -15,3 +15,32 @@ jobs:
           dotnet-version: '9.0.x'
       - name: Restore and build
         run: dotnet build "C#_проект_shcolo/C#_проект_shcolo/C#_проект_shcolo.csproj" --configuration Release
+      - name: Smoke test student view and teacher grade persistence
+        shell: bash
+        run: |
+          set -euo pipefail
+          PROJECT="C#_проект_shcolo/C#_проект_shcolo/C#_проект_shcolo.csproj"
+          DATA="C#_проект_shcolo/Data/school.json"
+          python3 - <<'PY'
+          import json
+          with open("C#_проект_shcolo/Data/school.json", encoding="utf-8") as f:
+              db = json.load(f)
+          assert len(db["Students"][0]["Grades"]) == 4
+          PY
+          printf '1\n1\n1\n\n3\n1\n6\n\n4\n\n0\n0\n' | dotnet run --project "$PROJECT" --configuration Release --no-build > student_output.txt
+          grep -q "GRADE SIMULATOR" student_output.txt
+          grep -q "SMART INSIGHTS" student_output.txt
+          printf '2\n1\n2\n1\n1\n6\n\n0\n0\n' | dotnet run --project "$PROJECT" --configuration Release --no-build > teacher_output.txt
+          grep -q "Записана оценка 6" teacher_output.txt
+          python3 - <<'PY'
+          import json
+          with open("C#_проект_shcolo/Data/school.json", encoding="utf-8") as f:
+              db = json.load(f)
+          student = db["Students"][0]
+          assert len(student["Grades"]) == 5
+          last = student["Grades"][-1]
+          assert last["Value"] == 6 and last["SubjectId"] == 1
+          assert db["NextGradeId"] == 12
+          PY
+          printf '1\n1\n1\n\n0\n0\n' | dotnet run --project "$PROJECT" --configuration Release --no-build > reload_output.txt
+          grep -q "ОЦЕНКИ: 5" reload_output.txt
