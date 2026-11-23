@@ -1,0 +1,8 @@
+# C# / Visual Studio build output
+**/bin/
+**/obj/
+.vs/
+*.user
+*.suo
+# Local environment
+.DS_Store

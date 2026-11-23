@@ -18,7 +18,22 @@ namespace C__проект_shcolo.Services
                 return 0;
             }
 
-            Student student = null;
+            bool subjectExists = false;
+            foreach (Subject subject in this.db.Subjects)
+            {
+                if (subject.Id == subjectId)
+                {
+                    subjectExists = true;
+                    break;
+                }
+            }
+
+            if (!subjectExists)
+            {
+                return 0;
+            }
+
+            Student? student = null;
             foreach (Student s in this.db.Students)
             {
                 if (s.Id == studentId)

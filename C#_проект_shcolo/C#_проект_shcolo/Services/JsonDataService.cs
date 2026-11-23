@@ -14,7 +14,7 @@ namespace C__проект_shcolo.Services
 
         private JsonSerializerOptions options;
 
-        public JsonDataService(string filePath = null)
+        public JsonDataService(string? filePath = null)
         {
             if (string.IsNullOrWhiteSpace(filePath))
             {
@@ -35,31 +35,51 @@ namespace C__проект_shcolo.Services
 
         private static string GetDefaultFilePath()
         {
-            DirectoryInfo directory =
-                new DirectoryInfo(Directory.GetCurrentDirectory());
-
-            while (directory != null)
+            // The app may be started from the solution, project folder,
+            // repository root, or its compiled bin/Debug directory.
+            string[] startingPoints =
             {
-                string[] projects =
-                    Directory.GetFiles(directory.FullName, "*.csproj");
+                Directory.GetCurrentDirectory(),
+                AppContext.BaseDirectory
+            };
 
-                if (projects.Length > 0)
+            foreach (string startingPoint in startingPoints)
+            {
+                DirectoryInfo? directory = new DirectoryInfo(startingPoint);
+                while (directory != null)
                 {
-                    return Path.Combine(
-                        directory.FullName,
-                        "Data",
-                        "school.json"
-                    );
-                }
+                    string directData = Path.Combine(
+                        directory.FullName, "Data", "school.json");
+                    if (File.Exists(directData))
+                    {
+                        return directData;
+                    }
 
-                directory = directory.Parent;
+                    string repositoryData = Path.Combine(
+                        directory.FullName, "C#_проект_shcolo", "Data", "school.json");
+                    if (File.Exists(repositoryData))
+                    {
+                        return repositoryData;
+                    }
+
+                    directory = directory.Parent;
+                }
             }
 
-            return Path.Combine(
-                Directory.GetCurrentDirectory(),
-                "Data",
-                "school.json"
-            );
+            // First run: create a Data folder beside the project file,
+            // not in a transient working directory.
+            DirectoryInfo? projectDirectory = new DirectoryInfo(AppContext.BaseDirectory);
+            while (projectDirectory != null)
+            {
+                if (Directory.GetFiles(projectDirectory.FullName, "*.csproj").Length > 0)
+                {
+                    return Path.Combine(projectDirectory.FullName, "Data", "school.json");
+                }
+
+                projectDirectory = projectDirectory.Parent;
+            }
+
+            return Path.Combine(AppContext.BaseDirectory, "Data", "school.json");
         }
 
         // Зарежда базата данни
@@ -84,7 +104,7 @@ namespace C__проект_shcolo.Services
             {
                 string json = File.ReadAllText(this.filePath);
 
-                SchoolDatabase database =
+                SchoolDatabase? database =
                     JsonSerializer.Deserialize<SchoolDatabase>(
                         json,
                         this.options
@@ -145,9 +165,12 @@ namespace C__проект_shcolo.Services
         // Вътрешен метод за запис
         private void SaveInternal(SchoolDatabase database)
         {
-            string directory = Path.GetDirectoryName(this.filePath);
+            string? directory = Path.GetDirectoryName(this.filePath);
 
-            Directory.CreateDirectory(directory);
+            if (!string.IsNullOrEmpty(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
 
             string json = JsonSerializer.Serialize(
                 database,
