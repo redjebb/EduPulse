@@ -13,7 +13,7 @@ namespace C__проект_shcolo.Services
             this.db = db;
         }
 
-        public Student FindStudent(int studentId)
+        public Student? FindStudent(int studentId)
         {
             foreach (Student student in this.db.Students)
             {
@@ -25,7 +25,7 @@ namespace C__проект_shcolo.Services
             return null;
         }
 
-        public Subject FindSubject(int subjectId)
+        public Subject? FindSubject(int subjectId)
         {
             foreach (Subject subject in this.db.Subjects)
             {
@@ -44,8 +44,8 @@ namespace C__проект_shcolo.Services
                 return false;
             }
 
-            Student student = this.FindStudent(studentId);
-            Subject subject = this.FindSubject(subjectId);
+            Student? student = this.FindStudent(studentId);
+            Subject? subject = this.FindSubject(subjectId);
 
             if (student == null || subject == null)
             {
