@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Spectre.Console;
 using C__проект_shcolo.Models;
 using C__проект_shcolo.Services;
 
@@ -30,11 +31,11 @@ namespace C__проект_shcolo.UI
             while (true)
             {
                 Header("ГЛАВНО МЕНЮ", "Електронният дневник, който показва напредъка");
-                MenuItem("1", "Вход като ученик");
-                MenuItem("2", "Вход като учител");
+                MenuItem("1", "Ученически портал");
+                MenuItem("2", "Преподавателски портал");
                 MenuItem("0", "Изход");
-                Footer("DEMO MODE  •  Локални данни  •  C# / .NET 9");
-                int choice = InputValidator.ReadInt("Избор: ", 0, 2);
+                Footer("EDUPULSE  •  ЕЛЕКТРОНЕН ДНЕВНИК");
+                int choice = SelectOption("Избор: ", new[] { "Изход", "Ученически портал", "Преподавателски портал" });
                 if (choice == 0) return;
                 if (choice == 1) ChooseStudent();
                 else ChooseTeacher();
@@ -43,7 +44,7 @@ namespace C__проект_shcolo.UI
 
         private void ChooseStudent()
         {
-            Header("ИЗБОР НА УЧЕНИК", "Демо профили");
+            Header("УЧЕНИЧЕСКИ ПОРТАЛ", "Избор на ученически профил");
             if (database.Students.Count == 0)
             {
                 Notice("Няма въведени ученици.", ConsoleColor.Yellow);
@@ -56,13 +57,13 @@ namespace C__проект_shcolo.UI
                 MenuItem((i + 1).ToString(), $"{student.Name} · {student.ClassName}");
             }
             MenuItem("0", "Назад");
-            int choice = InputValidator.ReadInt("Избор: ", 0, database.Students.Count);
+            int choice = SelectOption("Избор: ", new[] { "Назад" }.Concat(database.Students.Select(st => $"{st.Name} · {st.ClassName}")).ToArray());
             if (choice > 0) StudentDashboard(database.Students[choice - 1]);
         }
 
         private void ChooseTeacher()
         {
-            Header("ИЗБОР НА УЧИТЕЛ", "Демо профили");
+            Header("ПРЕПОДАВАТЕЛСКИ ПОРТАЛ", "Избор на преподавател");
             if (database.Teachers.Count == 0)
             {
                 Notice("Няма въведени учители.", ConsoleColor.Yellow);
@@ -75,7 +76,7 @@ namespace C__проект_shcolo.UI
                 MenuItem((i + 1).ToString(), teacher.Name);
             }
             MenuItem("0", "Назад");
-            int choice = InputValidator.ReadInt("Избор: ", 0, database.Teachers.Count);
+            int choice = SelectOption("Избор: ", new[] { "Назад" }.Concat(database.Teachers.Select(t => t.Name)).ToArray());
             if (choice > 0) TeacherDashboard(database.Teachers[choice - 1]);
         }
 
@@ -93,7 +94,7 @@ namespace C__проект_shcolo.UI
                 MenuItem("3", "Grade Simulator");
                 MenuItem("4", "Smart Insights");
                 MenuItem("0", "Назад");
-                int choice = InputValidator.ReadInt("Избор: ", 0, 4);
+                int choice = SelectOption("Избор: ", new[] { "Назад", "Моите оценки", "Успех по предмети", "Grade Simulator", "Smart Insights" });
                 if (choice == 0) return;
                 switch (choice)
                 {
@@ -119,7 +120,7 @@ namespace C__проект_shcolo.UI
                 MenuItem("2", "Добави оценка");
                 MenuItem("3", "Преглед на оценки");
                 MenuItem("0", "Назад");
-                int choice = InputValidator.ReadInt("Избор: ", 0, 3);
+                int choice = SelectOption("Избор: ", new[] { "Назад", "Списък с ученици", "Добави оценка", "Преглед на оценки" });
                 if (choice == 0) return;
                 switch (choice)
                 {
@@ -137,11 +138,20 @@ namespace C__проект_shcolo.UI
         private void ShowStudents()
         {
             Header("СПИСЪК С УЧЕНИЦИ", "Училищна база данни");
+            var table = new Table().Border(TableBorder.Rounded).BorderColor(Color.Grey);
+            table.AddColumn("[aqua]ID[/]");
+            table.AddColumn("[aqua]Ученик[/]");
+            table.AddColumn("[aqua]Клас[/]");
+            table.AddColumn("[aqua]Оценки[/]");
             foreach (Student student in database.Students)
             {
-                Console.WriteLine($"  {student.Id,-4} {student.Name,-26} {student.ClassName,-8} Оценки: {student.Grades.Count}");
+                table.AddRow(student.Id.ToString(), Markup.Escape(student.Name),
+                    Markup.Escape(student.ClassName), student.Grades.Count.ToString());
             }
-            if (database.Students.Count == 0) Notice("Няма ученици.", ConsoleColor.Yellow);
+            if (database.Students.Count == 0)
+                Notice("Няма ученици.", ConsoleColor.Yellow);
+            else
+                AnsiConsole.Write(table);
         }
 
         private Student? SelectStudent()
@@ -156,7 +166,7 @@ namespace C__проект_shcolo.UI
                 Notice("Няма ученици.", ConsoleColor.Yellow);
                 return null;
             }
-            int choice = InputValidator.ReadInt("Избор: ", 0, database.Students.Count);
+            int choice = SelectOption("Избор: ", new[] { "Назад" }.Concat(database.Students.Select(st => $"{st.Name} · {st.ClassName}")).ToArray());
             return choice == 0 ? null : database.Students[choice - 1];
         }
 
@@ -174,7 +184,7 @@ namespace C__проект_shcolo.UI
                 MenuItem((i + 1).ToString(), options[i].Name);
             }
             MenuItem("0", "Отказ");
-            int choice = InputValidator.ReadInt("Предмет: ", 0, options.Count);
+            int choice = SelectOption("Предмет: ", new[] { "Отказ" }.Concat(options.Select(x => x.Name)).ToArray());
             return choice == 0 ? null : options[choice - 1];
         }
 
@@ -217,46 +227,44 @@ namespace C__проект_shcolo.UI
                 Notice("Няма въведени оценки.", ConsoleColor.Yellow);
                 return;
             }
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine($"  {"ПРЕДМЕТ",-24} {"ОЦЕНКА",-8} ДАТА");
-            Console.ResetColor();
-            Console.WriteLine("  " + new string('─', 49));
+            var table = new Table().Border(TableBorder.Rounded).BorderColor(Color.Grey);
+            table.AddColumn("[aqua]Предмет[/]");
+            table.AddColumn("[aqua]Оценка[/]");
+            table.AddColumn("[aqua]Дата[/]");
             foreach (Grade grade in student.Grades.OrderByDescending(g => g.Date))
             {
                 Subject? subject = grades.FindSubject(grade.SubjectId);
-                Console.Write($"  {(subject?.Name ?? "Неизвестен"),-24} ");
-                Console.ForegroundColor = GradeColor(grade.Value);
-                Console.Write($"{grade.Value,-8}");
-                Console.ResetColor();
-                Console.WriteLine($" {grade.Date:dd.MM.yyyy}");
+                string color = grade.Value >= 6 ? "springgreen2" :
+                    grade.Value >= 5 ? "aqua" : grade.Value >= 4 ? "yellow" : "red";
+                table.AddRow(Markup.Escape(subject?.Name ?? "Неизвестен"),
+                    $"[bold {color}]{grade.Value}[/]", grade.Date.ToString("dd.MM.yyyy"));
             }
-            Console.WriteLine();
+            AnsiConsole.Write(table);
             Metric("ОБЩ УСПЕХ", grades.GetAverage(student.Id).ToString("F2"));
         }
 
         private void ShowSubjectAverages(Student student)
         {
             Header("УСПЕХ ПО ПРЕДМЕТИ", student.Name);
+            var table = new Table().Border(TableBorder.Rounded).BorderColor(Color.Grey);
+            table.AddColumn("[aqua]Предмет[/]");
+            table.AddColumn("[aqua]Среден успех[/]");
+            table.AddColumn("[aqua]Прогрес[/]");
             foreach (Subject subject in database.Subjects)
             {
                 int count = student.Grades.Count(g => g.SubjectId == subject.Id);
-                string avg = count == 0 ? "Няма оценки" : grades.GetSubjectAverage(student.Id, subject.Id).ToString("F2");
-                Console.Write($"  {subject.Name,-26} ");
-                if (count > 0)
+                if (count == 0)
                 {
-                    double score = grades.GetSubjectAverage(student.Id, subject.Id);
-                    Console.ForegroundColor = score >= 5.5 ? ConsoleColor.Green : score >= 4.5 ? ConsoleColor.Cyan : ConsoleColor.Yellow;
-                    Console.Write($"{avg,-7} ");
-                    Console.ResetColor();
-                    int filled = (int)Math.Round((score - 2) / 4.0 * 16);
-                    filled = Math.Clamp(filled, 0, 16);
-                    Console.WriteLine(new string('█', filled) + new string('░', 16 - filled));
+                    table.AddRow(Markup.Escape(subject.Name), "[grey]Няма оценки[/]", "[grey]—[/]");
+                    continue;
                 }
-                else
-                {
-                    Console.WriteLine(avg);
-                }
+                double score = grades.GetSubjectAverage(student.Id, subject.Id);
+                string color = score >= 5.5 ? "springgreen2" : score >= 4.5 ? "aqua" : "yellow";
+                int filled = Math.Clamp((int)Math.Round((score - 2) / 4.0 * 12), 0, 12);
+                table.AddRow(Markup.Escape(subject.Name), $"[bold {color}]{score:F2}[/]",
+                    $"[{color}]{new string('━', filled)}[/][grey]{new string('─', 12 - filled)}[/]");
             }
+            AnsiConsole.Write(table);
         }
 
         private void ShowSimulator(Student student)
@@ -284,33 +292,49 @@ namespace C__проект_shcolo.UI
         private void ShowInsights(Student student)
         {
             Header("SMART INSIGHTS", student.Name);
-            foreach (string summary in insights.GetSummary(student.Id))
-            {
-                Console.WriteLine("  • " + summary);
-            }
+            var items = insights.GetSummary(student.Id)
+                .Select(line => "• " + Markup.Escape(line));
+            AnsiConsole.Write(new Panel(new Markup(string.Join("\n", items)))
+                .Header("[aqua]Анализ на успеха[/]")
+                .Border(BoxBorder.Rounded).BorderColor(Color.Teal));
         }
 
         private static void Header(string title, string subtitle)
         {
-            if (!Console.IsOutputRedirected) Console.Clear();
-            Console.ForegroundColor = ConsoleColor.DarkCyan;
-            Console.WriteLine("  ╭──────────────────────────────────────────────────────────╮");
-            Console.Write("  │  ");
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.Write("◆ EDUPULSE");
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.WriteLine("                          SCHOOL CONSOLE  │");
-            Console.ForegroundColor = ConsoleColor.DarkCyan;
-            Console.WriteLine("  ╰──────────────────────────────────────────────────────────╯");
-            Console.ResetColor();
-            Console.WriteLine();
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("  " + title);
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.WriteLine("  " + subtitle);
-            Console.ResetColor();
-            Console.WriteLine("  " + new string('─', 54));
-            Console.WriteLine();
+            if (!Console.IsOutputRedirected)
+            {
+                Console.Clear();
+            }
+
+            var panel = new Panel(new Markup(
+                "[bold aqua]EDUPULSE[/]   [grey]·[/]   [silver]Електронен дневник[/]"))
+                .Header("[aqua] SCHOOL PORTAL [/]")
+                .Border(BoxBorder.Rounded)
+                .BorderColor(Color.Teal);
+            AnsiConsole.Write(panel);
+            AnsiConsole.MarkupLine($"[bold white]{Markup.Escape(title)}[/]");
+            AnsiConsole.MarkupLine($"[grey]{Markup.Escape(subtitle)}[/]");
+            AnsiConsole.WriteLine();
+        }
+
+        private static int SelectOption(string prompt, string[] labels)
+        {
+            if (labels.Length == 0) return 0;
+
+            // CI, scripted input and redirected terminals keep numeric choices.
+            if (Console.IsInputRedirected || Console.IsOutputRedirected ||
+                !AnsiConsole.Profile.Capabilities.Interactive)
+            {
+                return InputValidator.ReadInt(prompt, 0, labels.Length - 1);
+            }
+
+            string selected = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("[aqua]Избери опция[/]")
+                    .PageSize(Math.Min(10, labels.Length))
+                    .HighlightStyle(new Style(Color.Aqua))
+                    .AddChoices(labels));
+            return Array.IndexOf(labels, selected);
         }
 
         private static void Section(string title)
@@ -332,19 +356,16 @@ namespace C__проект_shcolo.UI
 
         private static void MenuItem(string index, string title)
         {
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.Write("  [" + index + "] ");
-            Console.ResetColor();
-            Console.WriteLine(title);
+            if (Console.IsInputRedirected || Console.IsOutputRedirected ||
+                !AnsiConsole.Profile.Capabilities.Interactive)
+            {
+                AnsiConsole.MarkupLine($"  [aqua][[{Markup.Escape(index)}]][/]  {Markup.Escape(title)}");
+            }
         }
 
         private static void Metric(string label, string value)
         {
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.Write("  " + label + ": ");
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine(value);
-            Console.ResetColor();
+            AnsiConsole.MarkupLine($"  [grey]{Markup.Escape(label)}:[/] [bold springgreen2]{Markup.Escape(value)}[/]");
         }
 
         private static ConsoleColor GradeColor(int value)

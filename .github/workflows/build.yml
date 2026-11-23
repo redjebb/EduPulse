@@ -19,6 +19,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          trap 'echo "---- STUDENT ----"; cat student_output.txt 2>/dev/null || true; echo "---- TEACHER ----"; cat teacher_output.txt 2>/dev/null || true; echo "---- RELOAD ----"; cat reload_output.txt 2>/dev/null || true' ERR
           PROJECT="C#_проект_shcolo/C#_проект_shcolo/C#_проект_shcolo.csproj"
           DATA="C#_проект_shcolo/Data/school.json"
           python3 - <<'PY'
@@ -43,7 +44,7 @@ jobs:
           assert db["NextGradeId"] == 12
           PY
           printf '1\n1\n1\n\n0\n0\n' | dotnet run --project "$PROJECT" --configuration Release --no-build > reload_output.txt
-          grep -q "ОЦЕНКИ: 5" reload_output.txt
+          grep -Eq "ОЦЕНКИ:.*5" reload_output.txt
       - name: Reject invalid input and exit cleanly on EOF
         shell: bash
         run: |
