@@ -11,13 +11,17 @@ namespace C__проект_shcolo.UI
                 Console.ForegroundColor = ConsoleColor.Gray;
                 Console.Write(prompt);
                 Console.ResetColor();
-                string input = Console.ReadLine() ?? "";
+                string? input = Console.ReadLine();
+                if (input == null)
+                {
+                    throw new OperationCanceledException("Входът е прекъснат.");
+                }
                 if (int.TryParse(input, out int value) && value >= min && value <= max)
                 {
                     return value;
                 }
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine($"Моля, въведете число от {min} до {max}.");
+                Console.WriteLine($"Невалиден избор. Въведете цяло число от {min} до {max}.");
                 Console.ResetColor();
             }
         }
