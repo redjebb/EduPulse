@@ -5,8 +5,8 @@ namespace C__проект_shcolo.Models
     public class Teacher
     {
         private int id;
-        private string name;
-        private List<int> subjectIds;
+        private string name = string.Empty;
+        private List<int> subjectIds = new List<int>();
 
         public Teacher()
         {
