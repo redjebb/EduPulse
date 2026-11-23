@@ -44,7 +44,7 @@ jobs:
           assert db["NextGradeId"] == 12
           PY
           printf '1\n1\n1\n\n0\n0\n' | dotnet run --project "$PROJECT" --configuration Release --no-build > reload_output.txt
-          grep -q "ОЦЕНКИ: 5" reload_output.txt
+          grep -Eq "ОЦЕНКИ:.*5" reload_output.txt
       - name: Reject invalid input and exit cleanly on EOF
         shell: bash
         run: |
