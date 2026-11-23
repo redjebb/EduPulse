@@ -35,36 +35,51 @@ namespace C__проект_shcolo.Services
 
         private static string GetDefaultFilePath()
         {
-            DirectoryInfo directory =
-                new DirectoryInfo(Directory.GetCurrentDirectory());
-
-            while (directory != null)
+            // The app may be started from the solution, project folder,
+            // repository root, or its compiled bin/Debug directory.
+            string[] startingPoints =
             {
-                string[] projects =
-                    Directory.GetFiles(directory.FullName, "*.csproj");
+                Directory.GetCurrentDirectory(),
+                AppContext.BaseDirectory
+            };
 
-                if (projects.Length > 0)
+            foreach (string startingPoint in startingPoints)
+            {
+                DirectoryInfo? directory = new DirectoryInfo(startingPoint);
+                while (directory != null)
                 {
-                    // The repository stores its demo database one directory above the .csproj.
-                    string repositoryDataPath = Path.Combine(
-                        directory.Parent?.FullName ?? directory.FullName,
-                        "Data", "school.json");
-                    if (File.Exists(repositoryDataPath))
+                    string directData = Path.Combine(
+                        directory.FullName, "Data", "school.json");
+                    if (File.Exists(directData))
                     {
-                        return repositoryDataPath;
+                        return directData;
                     }
 
-                    return Path.Combine(directory.FullName, "Data", "school.json");
-                }
+                    string repositoryData = Path.Combine(
+                        directory.FullName, "C#_проект_shcolo", "Data", "school.json");
+                    if (File.Exists(repositoryData))
+                    {
+                        return repositoryData;
+                    }
 
-                directory = directory.Parent;
+                    directory = directory.Parent;
+                }
             }
 
-            return Path.Combine(
-                Directory.GetCurrentDirectory(),
-                "Data",
-                "school.json"
-            );
+            // First run: create a Data folder beside the project file,
+            // not in a transient working directory.
+            DirectoryInfo? projectDirectory = new DirectoryInfo(AppContext.BaseDirectory);
+            while (projectDirectory != null)
+            {
+                if (Directory.GetFiles(projectDirectory.FullName, "*.csproj").Length > 0)
+                {
+                    return Path.Combine(projectDirectory.FullName, "Data", "school.json");
+                }
+
+                projectDirectory = projectDirectory.Parent;
+            }
+
+            return Path.Combine(AppContext.BaseDirectory, "Data", "school.json");
         }
 
         // Зарежда базата данни
