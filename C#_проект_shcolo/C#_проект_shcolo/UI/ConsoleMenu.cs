@@ -188,6 +188,7 @@ namespace C__проект_shcolo.UI
             Subject? subject = SelectSubject(allowedSubjects);
             if (subject == null) return;
             int value = InputValidator.ReadInt("Оценка (2–6): ", 2, 6);
+            int previousNextId = database.NextGradeId;
             if (!grades.AddGrade(student.Id, subject.Id, value))
             {
                 Notice("Оценката не може да бъде добавена.", ConsoleColor.Red);
@@ -200,8 +201,11 @@ namespace C__проект_shcolo.UI
             }
             catch (Exception ex)
             {
-                Notice("Грешка при запис: " + ex.Message, ConsoleColor.Red);
-                Notice("Промяната е само в паметта. Излезте и проверете файла, преди да въвеждате още оценки.", ConsoleColor.Yellow);
+                // Roll back the uncommitted grade to keep memory in sync with the file.
+                student.Grades.RemoveAll(g => g.Id == previousNextId);
+                database.NextGradeId = previousNextId;
+                Notice("Оценката не е записана. Промяната беше отменена.", ConsoleColor.Red);
+                Notice("Причина: " + ex.Message, ConsoleColor.Yellow);
             }
         }
 
