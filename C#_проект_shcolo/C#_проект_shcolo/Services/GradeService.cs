@@ -61,7 +61,7 @@ namespace C__проект_shcolo.Services
 
         public List<Grade> GetGrades(int studentId)
         {
-            Student student = this.FindStudent(studentId);
+            Student? student = this.FindStudent(studentId);
             if (student == null)
             {
                 return new List<Grade>();
@@ -71,7 +71,7 @@ namespace C__проект_shcolo.Services
 
         public double GetAverage(int studentId)
         {
-            Student student = this.FindStudent(studentId);
+            Student? student = this.FindStudent(studentId);
             if (student == null || student.Grades.Count == 0)
             {
                 return 0;
@@ -88,7 +88,7 @@ namespace C__проект_shcolo.Services
 
         public double GetSubjectAverage(int studentId, int subjectId)
         {
-            Student student = this.FindStudent(studentId);
+            Student? student = this.FindStudent(studentId);
             if (student == null)
             {
                 return 0;
