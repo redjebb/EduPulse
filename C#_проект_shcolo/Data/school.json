@@ -1,0 +1,117 @@
+{
+  "Students": [
+    {
+      "Id": 1,
+      "Name": "Иван Петров",
+      "ClassName": "10А",
+      "Grades": [
+        {
+          "Id": 1,
+          "StudentId": 1,
+          "SubjectId": 1,
+          "Value": 5,
+          "Date": "2026-11-17T10:30:00"
+        },
+        {
+          "Id": 2,
+          "StudentId": 1,
+          "SubjectId": 1,
+          "Value": 6,
+          "Date": "2026-11-19T11:00:00"
+        },
+        {
+          "Id": 3,
+          "StudentId": 1,
+          "SubjectId": 2,
+          "Value": 5,
+          "Date": "2026-11-20T09:30:00"
+        },
+        {
+          "Id": 4,
+          "StudentId": 1,
+          "SubjectId": 3,
+          "Value": 4,
+          "Date": "2026-11-21T12:00:00"
+        }
+      ]
+    },
+    {
+      "Id": 2,
+      "Name": "Мария Георгиева",
+      "ClassName": "10А",
+      "Grades": [
+        {
+          "Id": 5,
+          "StudentId": 2,
+          "SubjectId": 1,
+          "Value": 4,
+          "Date": "2026-11-17T10:30:00"
+        },
+        {
+          "Id": 6,
+          "StudentId": 2,
+          "SubjectId": 2,
+          "Value": 6,
+          "Date": "2026-11-19T11:00:00"
+        },
+        {
+          "Id": 7,
+          "StudentId": 2,
+          "SubjectId": 3,
+          "Value": 5,
+          "Date": "2026-11-20T09:30:00"
+        }
+      ]
+    },
+    {
+      "Id": 3,
+      "Name": "Георги Димитров",
+      "ClassName": "10Б",
+      "Grades": [
+        {
+          "Id": 8,
+          "StudentId": 3,
+          "SubjectId": 1,
+          "Value": 3,
+          "Date": "2026-11-17T10:30:00"
+        },
+        {
+          "Id": 9,
+          "StudentId": 3,
+          "SubjectId": 2,
+          "Value": 5,
+          "Date": "2026-11-19T11:00:00"
+        },
+        {
+          "Id": 10,
+          "StudentId": 3,
+          "SubjectId": 3,
+          "Value": 6,
+          "Date": "2026-11-20T09:30:00"
+        }
+      ]
+    }
+  ],
+  "Teachers": [
+    {
+      "Id": 1,
+      "Name": "Петър Иванов",
+      "SubjectIds": [1, 2, 3]
+    }
+  ],
+  "Subjects": [
+    {
+      "Id": 1,
+      "Name": "Математика"
+    },
+    {
+      "Id": 2,
+      "Name": "Български език"
+    },
+    {
+      "Id": 3,
+      "Name": "Английски език"
+    }
+  ],
+  "NextGradeId": 11
+}
