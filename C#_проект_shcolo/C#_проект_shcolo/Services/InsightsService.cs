@@ -16,7 +16,7 @@ namespace C__проект_shcolo.Services
 
         public string GetStrongestSubject(int studentId)
         {
-            Subject bestSubject = null;
+            Subject? bestSubject = null;
             double highestAvg = 0;
 
             foreach (Subject subject in this.db.Subjects)
@@ -39,7 +39,7 @@ namespace C__проект_shcolo.Services
 
         public string GetWeakestSubject(int studentId)
         {
-            Subject weakestSubject = null;
+            Subject? weakestSubject = null;
             double lowestAvg = 7.0;
 
             foreach (Subject subject in this.db.Subjects)
@@ -63,7 +63,7 @@ namespace C__проект_shcolo.Services
         public List<string> GetSummary(int studentId)
         {
             List<string> insights = new List<string>();
-            Student student = this.gradeService.FindStudent(studentId);
+            Student? student = this.gradeService.FindStudent(studentId);
 
             if (student == null || student.Grades.Count == 0)
             {
