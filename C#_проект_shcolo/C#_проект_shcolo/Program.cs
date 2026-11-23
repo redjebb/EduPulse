@@ -18,6 +18,11 @@ namespace C__проект_shcolo
                 SchoolDatabase database = storage.Load();
                 new ConsoleMenu(database, storage).Run();
             }
+            catch (OperationCanceledException)
+            {
+                Console.ResetColor();
+                Console.WriteLine("Входът е приключил. Изход от EduPulse.");
+            }
             catch (InvalidDataException ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
