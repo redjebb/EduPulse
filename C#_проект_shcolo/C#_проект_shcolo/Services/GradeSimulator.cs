@@ -33,7 +33,7 @@ namespace C__проект_shcolo.Services
                 return 0;
             }
 
-            Student student = null;
+            Student? student = null;
             foreach (Student s in this.db.Students)
             {
                 if (s.Id == studentId)
