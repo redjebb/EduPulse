@@ -294,7 +294,7 @@ namespace C__проект_shcolo.UI
             Header("SMART INSIGHTS", student.Name);
             var items = insights.GetSummary(student.Id)
                 .Select(line => "• " + Markup.Escape(line));
-            AnsiConsole.Write(new Panel(new Markup(string.Join("\\n", items)))
+            AnsiConsole.Write(new Panel(new Markup(string.Join("\n", items)))
                 .Header("[aqua]Анализ на успеха[/]")
                 .Border(BoxBorder.Rounded).BorderColor(Color.Teal));
         }
