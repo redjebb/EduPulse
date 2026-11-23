@@ -14,7 +14,7 @@ jobs:
         with:
           dotnet-version: '9.0.x'
       - name: Restore and build
-        run: dotnet build "C#_проект_shcolo/C#_проект_shcolo/C#_проект_shcolo.csproj" --configuration Release
+        run: dotnet build "C#_проект_shcolo/C#_проект_shcolo/C#_проект_shcolo.csproj" --configuration Release -warnaserror
       - name: Smoke test student view and teacher grade persistence
         shell: bash
         run: |
@@ -44,3 +44,20 @@ jobs:
           PY
           printf '1\n1\n1\n\n0\n0\n' | dotnet run --project "$PROJECT" --configuration Release --no-build > reload_output.txt
           grep -q "ОЦЕНКИ: 5" reload_output.txt
+      - name: Reject invalid input and exit cleanly on EOF
+        shell: bash
+        run: |
+          set -euo pipefail
+          PROJECT="C#_проект_shcolo/C#_проект_shcolo/C#_проект_shcolo.csproj"
+          printf 'abc\n9\n0\n' | dotnet run --project "$PROJECT" --configuration Release --no-build > invalid_output.txt
+          test "$(grep -c 'Невалиден избор' invalid_output.txt)" -eq 2
+          printf '' | dotnet run --project "$PROJECT" --configuration Release --no-build > eof_output.txt
+          grep -q 'Входът е приключил' eof_output.txt
+      - name: Check interactive console rendering under a pseudo-terminal
+        shell: bash
+        run: |
+          set -euo pipefail
+          PROJECT="C#_проект_shcolo/C#_проект_shcolo/C#_проект_shcolo.csproj"
+          printf '0\n' | script -q -e -c "dotnet run --project '$PROJECT' --configuration Release --no-build" /dev/null > tty_output.txt
+          grep -q EDUPULSE tty_output.txt
+          grep -q 'ГЛАВНО МЕНЮ' tty_output.txt
