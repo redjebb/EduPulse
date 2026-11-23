@@ -4,9 +4,9 @@ namespace C__проект_shcolo.Models
 {
     public class SchoolDatabase
     {
-        private List<Student> students;
-        private List<Teacher> teachers;
-        private List<Subject> subjects;
+        private List<Student> students = new List<Student>();
+        private List<Teacher> teachers = new List<Teacher>();
+        private List<Subject> subjects = new List<Subject>();
         private int nextGradeId;
 
         public SchoolDatabase()
