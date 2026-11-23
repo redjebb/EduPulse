@@ -5,9 +5,9 @@ namespace C__проект_shcolo.Models
     public class Student
     {
         private int id;
-        private string name;
-        private string className;
-        private List<Grade> grades;
+        private string name = string.Empty;
+        private string className = string.Empty;
+        private List<Grade> grades = new List<Grade>();
 
         public Student()
         {
