@@ -3,7 +3,7 @@
     public class Subject
     {
         private int id;
-        private string name;
+        private string name = string.Empty;
 
         public Subject()
         {
