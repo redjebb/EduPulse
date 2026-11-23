@@ -45,11 +45,16 @@ namespace C__проект_shcolo.Services
 
                 if (projects.Length > 0)
                 {
-                    return Path.Combine(
-                        directory.FullName,
-                        "Data",
-                        "school.json"
-                    );
+                    // The repository stores its demo database one directory above the .csproj.
+                    string repositoryDataPath = Path.Combine(
+                        directory.Parent?.FullName ?? directory.FullName,
+                        "Data", "school.json");
+                    if (File.Exists(repositoryDataPath))
+                    {
+                        return repositoryDataPath;
+                    }
+
+                    return Path.Combine(directory.FullName, "Data", "school.json");
                 }
 
                 directory = directory.Parent;
