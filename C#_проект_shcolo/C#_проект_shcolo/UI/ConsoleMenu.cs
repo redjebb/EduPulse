@@ -331,7 +331,7 @@ namespace C__проект_shcolo.UI
             string selected = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
                     .Title("[aqua]Избери опция[/]")
-                    .PageSize(Math.Min(10, labels.Length))
+                    .PageSize(Math.Max(3, Math.Min(10, labels.Length)))
                     .HighlightStyle(new Style(Color.Aqua))
                     .AddChoices(labels));
             return Array.IndexOf(labels, selected);
