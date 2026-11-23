@@ -14,7 +14,7 @@ namespace C__проект_shcolo.Services
 
         private JsonSerializerOptions options;
 
-        public JsonDataService(string filePath = null)
+        public JsonDataService(string? filePath = null)
         {
             if (string.IsNullOrWhiteSpace(filePath))
             {
@@ -104,7 +104,7 @@ namespace C__проект_shcolo.Services
             {
                 string json = File.ReadAllText(this.filePath);
 
-                SchoolDatabase database =
+                SchoolDatabase? database =
                     JsonSerializer.Deserialize<SchoolDatabase>(
                         json,
                         this.options
@@ -165,9 +165,12 @@ namespace C__проект_shcolo.Services
         // Вътрешен метод за запис
         private void SaveInternal(SchoolDatabase database)
         {
-            string directory = Path.GetDirectoryName(this.filePath);
+            string? directory = Path.GetDirectoryName(this.filePath);
 
-            Directory.CreateDirectory(directory);
+            if (!string.IsNullOrEmpty(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
 
             string json = JsonSerializer.Serialize(
                 database,
