@@ -217,7 +217,11 @@ namespace C__проект_shcolo.UI
             foreach (Grade grade in student.Grades.OrderByDescending(g => g.Date))
             {
                 Subject? subject = grades.FindSubject(grade.SubjectId);
-                Console.WriteLine($"  {(subject?.Name ?? "Неизвестен"),-24} {grade.Value,-8} {grade.Date:dd.MM.yyyy}");
+                Console.Write($"  {(subject?.Name ?? "Неизвестен"),-24} ");
+                Console.ForegroundColor = GradeColor(grade.Value);
+                Console.Write($"{grade.Value,-8}");
+                Console.ResetColor();
+                Console.WriteLine($" {grade.Date:dd.MM.yyyy}");
             }
             Console.WriteLine();
             Metric("ОБЩ УСПЕХ", grades.GetAverage(student.Id).ToString("F2"));
@@ -230,7 +234,21 @@ namespace C__проект_shcolo.UI
             {
                 int count = student.Grades.Count(g => g.SubjectId == subject.Id);
                 string avg = count == 0 ? "Няма оценки" : grades.GetSubjectAverage(student.Id, subject.Id).ToString("F2");
-                Console.WriteLine($"  {subject.Name,-26} {avg}");
+                Console.Write($"  {subject.Name,-26} ");
+                if (count > 0)
+                {
+                    double score = grades.GetSubjectAverage(student.Id, subject.Id);
+                    Console.ForegroundColor = score >= 5.5 ? ConsoleColor.Green : score >= 4.5 ? ConsoleColor.Cyan : ConsoleColor.Yellow;
+                    Console.Write($"{avg,-7} ");
+                    Console.ResetColor();
+                    int filled = (int)Math.Round((score - 2) / 4.0 * 16);
+                    filled = Math.Clamp(filled, 0, 16);
+                    Console.WriteLine(new string('█', filled) + new string('░', 16 - filled));
+                }
+                else
+                {
+                    Console.WriteLine(avg);
+                }
             }
         }
 
@@ -292,6 +310,14 @@ namespace C__проект_shcolo.UI
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine(value);
             Console.ResetColor();
+        }
+
+        private static ConsoleColor GradeColor(int value)
+        {
+            return value >= 6 ? ConsoleColor.Green
+                : value >= 5 ? ConsoleColor.Cyan
+                : value >= 4 ? ConsoleColor.Yellow
+                : ConsoleColor.Red;
         }
 
         private static void Notice(string text, ConsoleColor color)
